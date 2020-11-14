@@ -57,8 +57,6 @@ impl Camera {
 
         for y in 0..self.vsize {
             for x in 0..self.hsize {
-        // for x in 85..87 {
-        //   for y in 149..151 {
                 let ray = self.ray_for_pixel(x as f64, y as f64);
                 let mut color = world.color_at(ray, rd);
                 if ss > 0 {

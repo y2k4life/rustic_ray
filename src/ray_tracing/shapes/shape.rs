@@ -47,8 +47,16 @@ impl Clone for Box<dyn Shape> {
     }
 }
 
+/*
 impl PartialEq for Box<dyn Shape> {
     fn eq(&self, other: &Box<dyn Shape>) -> bool {
+        self.shape_eq(other.as_any())
+    }
+}
+*/
+
+impl PartialEq for dyn Shape {
+    fn eq(&self, other: &Self) -> bool {
         self.shape_eq(other.as_any())
     }
 }

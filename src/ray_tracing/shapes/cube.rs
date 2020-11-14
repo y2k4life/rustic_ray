@@ -48,12 +48,12 @@ impl Shape for Cube {
 
     fn local_intersect(&self, ray: Ray) -> Option<Vec<Intersection>> {
         Some(vec![
-            Intersection::new(ray.origin.x, Box::new(self.clone())),
-            Intersection::new(ray.origin.y, Box::new(self.clone())),
-            Intersection::new(ray.origin.z, Box::new(self.clone())),
-            Intersection::new(ray.direction.x, Box::new(self.clone())),
-            Intersection::new(ray.direction.y, Box::new(self.clone())),
-            Intersection::new(ray.direction.z, Box::new(self.clone())),
+            Intersection::new(ray.origin.x, self),
+            Intersection::new(ray.origin.y, self),
+            Intersection::new(ray.origin.z, self),
+            Intersection::new(ray.direction.x, self),
+            Intersection::new(ray.direction.y, self),
+            Intersection::new(ray.direction.z, self),
             ])
         
     }

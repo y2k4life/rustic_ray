@@ -54,7 +54,7 @@ impl Shape for Plane {
         }
         else {
             Some(vec![
-                Intersection::new(-ray.origin.y / ray.direction.y, Box::new(self.clone())),
+                Intersection::new(-ray.origin.y / ray.direction.y, self),
             ])
         }
     }

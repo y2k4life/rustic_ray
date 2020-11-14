@@ -81,9 +81,9 @@ impl Shape for Sphere {
 
         if discriminant >= 0.0 {
             let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
-            xs.push(Intersection::new(t1, Box::new(self.clone())));
+            xs.push(Intersection::new(t1, self));
             let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-            xs.push(Intersection::new(t2, Box::new(self.clone())));
+            xs.push(Intersection::new(t2, self));
         }
 
         if xs.len() > 0 {
