@@ -17,35 +17,11 @@ pub use ray_tracing::vector::Vector;
 pub use ray_tracing::world::World;
 pub use ray_tracing::xs::XS;
 
-use std::cmp::Ordering;
+use std::{cmp::Ordering};
 
-pub const EPSILON: f64 = 0.00001;
+pub const EPSILON: f64 = 0.0001;
 
 pub fn float_eq(a: f64, b: f64) -> bool {
-    /*
-    let a1 = (a * 1000000.0).round() / 1000000.0;
-    let b1 = (b * 1000000.0).round() / 1000000.0;
-    // Calculate the difference.
-    let diff = (a1 - b1).abs();
-
-    let a2 = a1.abs();
-    let b2 = b1.abs();
-    // Find the largest
-    let largest: f64;
-    if b2 > a2 {
-        largest = b2 * EPSILON;
-    } else {
-        largest = a2 * EPSILON;
-    }
-
-    let mut results:bool = false;
-    if diff <= largest {
-        results = true;
-    }
-
-    results
-    */
-
     (a - b).abs() < EPSILON
 }
 

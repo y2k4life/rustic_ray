@@ -42,7 +42,7 @@ impl World {
         let surface = comps.object.material().lighting(
             comps.object,
             self.lights[0],
-            comps.point,
+            comps.over_point,
             comps.eyev,
             comps.normalv,
             in_shadow,
@@ -412,7 +412,7 @@ mod tests {
         let xs = vec![i1.clone(), i2.clone(), i3.clone(), i4.clone()];
         let comps = Intersection::prepare_computations(&i3, r, &xs);
         let c = w.refracted_color(&comps, 5);
-        assert_eq!(c, Color::new(0.0, 0.998884539, 0.047219452));
+        assert_eq!(c, Color::new(0.0, 0.99888, 0.04725));
     }
 
     // Chapter 11 Reflection and Refraction
