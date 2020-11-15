@@ -28,12 +28,6 @@ impl Shape for Plane {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
-    /*
-    fn shape_clone(&self) -> Box<dyn Shape> {
-        Box::new((*self).clone())
-    }
-    */
-
     fn transform(&self) -> Matrix {
         self.transform
     }
@@ -42,8 +36,12 @@ impl Shape for Plane {
         self.transform = transform;
     }
 
-    fn material(&self) -> Material {
-        self.material.clone()
+    fn material(&self) -> &Material {
+        &self.material
+    }
+
+    fn material_mut(&mut self) -> &mut Material {
+        &mut self.material
     }
 
     fn set_material(&mut self, material: Material) {

@@ -28,7 +28,7 @@ impl World {
                 }
             }
         }
-        if xs.len() == 0 {
+        if xs.is_empty() {
             None
         } else {
             xs.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -110,12 +110,10 @@ impl World {
             let cos_i = comps.eyev.dot(comps.normalv);
             let sin2_t = n_ratio.powf(2.0) * (1.0 - cos_i.powf(2.0));
 
-            if sin2_t > 1.0
-            {
+            if sin2_t > 1.0 {
                 color::BLACK
             }
-            else
-            {
+            else {
                 let cos_t = (1.0 - sin2_t).sqrt();
                 let direction = comps.normalv * (n_ratio * cos_i - cos_t) - comps.eyev * n_ratio;
                 let refract_ray = Ray::new(comps.under_point, direction);
@@ -198,7 +196,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
         let shape = w.objects[0].as_ref();
         let i = Intersection::new(4.0, shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let c = w.shade_hit(&comps, 5);
         assert_eq!(Color::new(0.38066, 0.47583, 0.2855), c);
     }
@@ -246,18 +244,18 @@ mod tests {
 
         let r = Ray::new(Point::new(0.0, 0.0, 5.0), Vector::new(0.0, 0.0, 1.0));
         let i = Intersection::new(4.0, w.objects[1].as_ref());
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let c = w.shade_hit(&comps, 5);
         assert_eq!(c, Color::new(0.1, 0.1, 0.1));
     }
 
     #[test]
     fn reflected_color_nonreflective_material() {
-        let w = World::default();
+        let mut w = World::default();
         let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
-        w.objects[1].material().ambient = 1.0;
+        w.objects[1].material_mut().ambient = 1.0;
         let i = Intersection::new(1.0, w.objects[1].as_ref());
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let color = w.reflected_color(&comps, 5);
         assert_eq!(color, color::BLACK);
     }
@@ -274,7 +272,7 @@ mod tests {
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
         let i = Intersection::new(2_f64.sqrt(), w.objects[2].as_ref());
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let color = w.reflected_color(&comps, 1);
         assert_eq!(color, Color::new(0.190332, 0.237915, 0.1427492));
     }
@@ -291,7 +289,7 @@ mod tests {
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
         let i = Intersection::new(2_f64.sqrt(), w.objects[2].as_ref());
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let color = w.shade_hit(&comps, 1);
         assert_eq!(color, Color::new(0.8767577, 0.924340789, 0.829174629));
     }
@@ -327,7 +325,7 @@ mod tests {
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
         let i = Intersection::new(2_f64.sqrt(), w.objects[2].as_ref());
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         let color = w.reflected_color(&comps, 0);
         assert_eq!(color, color::BLACK);
     }

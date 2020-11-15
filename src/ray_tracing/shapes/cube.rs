@@ -2,7 +2,7 @@ use super::Shape;
 use crate::{ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
 use std::any::Any;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Cube {
     pub transform: Matrix,
     pub material: Material,
@@ -38,8 +38,8 @@ impl Shape for Cube {
         self.transform = transform;
     }
 
-    fn material(&self) -> Material {
-        self.material.clone()
+    fn material(&self) -> &Material {
+        self.material
     }
 
     fn set_material(&mut self, material: Material) {

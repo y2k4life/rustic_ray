@@ -19,7 +19,7 @@ pub use ray_tracing::xs::XS;
 
 use std::cmp::Ordering;
 
-pub const EPSILON: f64 = 0.00001;
+pub const EPSILON: f64 = 0.0001;
 
 pub fn float_eq(a: f64, b: f64) -> bool {
     /*

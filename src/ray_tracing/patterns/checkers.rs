@@ -29,10 +29,6 @@ impl Pattern for Checkers {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
-    fn pattern_clone(&self) -> Box<dyn Pattern> {
-        Box::new((*self).clone())
-    }
-
     fn transform(&self) -> Matrix {
         self.transform
     }

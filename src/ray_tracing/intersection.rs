@@ -2,16 +2,10 @@ use crate::{EPSILON, Point, Ray, Vector, float_cmp};
 use crate::shapes::Shape;
 use std::cmp::Ordering;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Intersection<'a> {
     pub t: f64,
     pub object: &'a dyn Shape,
-}
-
-#[derive(Debug, Clone)]
-pub struct Intersection2<'a> {
-    pub t: f64,
-    pub object: &'a Box<dyn Shape>,
 }
 
 pub struct Computations<'a> {
@@ -30,22 +24,18 @@ pub struct Computations<'a> {
 
 impl Intersection<'_> {
     pub fn hit<'a>(xs: &'a [Intersection]) -> Option<Intersection<'a>> {
-        let mut hit = None;
-        let mut min_time = 0.0;
-        for i in xs.iter().filter(|x| x.t >= 0.0) {
-            if i.t < min_time || min_time == 0.0 {
-                hit = Some(Intersection::new(i.t, i.object));
-                min_time = i.t;
-            }
+        if let Some(hit) = xs.iter().filter(|x| x.t >= 0.0).min() {
+            Some(*hit)
         }
-
-        hit
+        else {
+            None
+        }
     }
 }
 
 impl<'a> Intersection<'a> {
     pub fn new(t: f64, object:&dyn Shape) -> Intersection {
-        Intersection { t, object: object }
+        Intersection { t, object }
     }
 
     pub fn prepare_computations<'h>(hit: &'h Intersection, r: Ray, xs: &[Intersection]) -> Computations<'h> {
@@ -66,7 +56,7 @@ impl<'a> Intersection<'a> {
         let mut container: Vec<&dyn Shape> = Vec::new();
         for i in xs.iter() {
             if i == hit {
-                if container.len() == 0 {
+                if container.is_empty() {
                     n1 = 1.0;
                 }
                 else if let Some(object) = container.last() {
@@ -75,14 +65,14 @@ impl<'a> Intersection<'a> {
             }
 
             if container.contains(&i.object) {
-                container = container.into_iter().filter(|o| *o != i.object.clone()).collect();
+                container = container.into_iter().filter(|o| *o != i.object).collect();
             }
             else {
-                container.push(i.object.clone());
+                container.push(i.object);
             }
 
             if i == hit {
-                if container.len() == 0 {
+                if container.is_empty() {
                     n2 = 1.0;
                 }
                 else if let Some(object) = container.last() {
@@ -112,13 +102,23 @@ impl<'a> Intersection<'a> {
 
 impl PartialEq for Intersection<'_> {
     fn eq(&self, other: &Intersection) -> bool {
-        self.t == other.t && &self.object == &other.object
+        self.t == other.t && self.object == other.object
     }
 }
 
 impl PartialOrd for Intersection<'_> {
     fn partial_cmp(&self, other: &Intersection) -> Option<Ordering> {
         Some(float_cmp(self.t, other.t))
+    }
+}
+
+impl Eq for Intersection<'_> {
+    
+}
+
+impl Ord for Intersection<'_> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        float_cmp(self.t, other.t)
     }
 }
 
@@ -241,7 +241,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
         let shape = Sphere::new();
         let i = Intersection::new(4.0, &shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         assert_eq!(comps.t, i.t);
         assert_eq!(comps.point, Point::new(0.0, 0.0, -1.0));
         assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
@@ -255,7 +255,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0));
         let shape = Sphere::new();
         let i = Intersection::new(4.0, &shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         assert_eq!(comps.inside, false);
     }
 
@@ -266,7 +266,7 @@ mod tests {
         let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 1.0));
         let shape = Sphere::new();
         let i = Intersection::new(1.0, &shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         assert_eq!(comps.point, Point::new(0.0, 0.0, 1.0));
         assert_eq!(comps.eyev, Vector::new(0.0, 0.0, -1.0));
         assert_eq!(comps.inside, true);
@@ -281,7 +281,7 @@ mod tests {
         let mut shape = Sphere::new();
         shape.transform = Transform::new().translation(0.0, 0.0, 1.0).build();
         let i = Intersection::new(5.0, &shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         assert!(comps.over_point.z < -EPSILON / 2.0);
         assert!(comps.point.z > comps.over_point.z);
     }
@@ -296,7 +296,7 @@ mod tests {
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
         let i = Intersection::new(2_f64.sqrt(), &shape);
-        let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
+        let comps = Intersection::prepare_computations(&i, r, &vec![i]);
         assert_eq!(
             comps.reflectv,
             Vector::new(0.0, 2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0)
@@ -336,7 +336,6 @@ mod tests {
             (2.5, 1.5),
             (1.5, 1.0)];
 
-        
         for i in 0..5 {
             let comps = Intersection::prepare_computations(&xs[i], r, &xs);
             assert_eq!(expected[i].0, comps.n1);

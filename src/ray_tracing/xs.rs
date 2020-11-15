@@ -12,14 +12,14 @@ pub struct XS {
 
 impl XS {
     pub fn new(t: f64, object: Box<dyn Shape>) -> Self {
-        XS {t, object: object}
+        XS {t, object}
     }
 }
 
 impl PartialEq for XS {
     fn eq(&self, other: &XS) -> bool {
         self.t == other.t &&
-        &self.object == &other.object
+        self.object.shape_eq(other.object.as_any())
     }
 }
 

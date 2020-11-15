@@ -12,20 +12,4 @@ I started to think of ownership and borrowing. The `World` owns `Shapes` in a `B
 
 ## performance
 
-There is a scene in `main` used to compare the cloning branch to the ownership and borrowing. I'm sure there is more to this than just cloning. I wonder the overhead on `Box`ing But what do I know I'm just starting to learn Rust. What I do know is the changes increase performance by 50%. I use the `time` function with Linux have yet to use benchmark in Rust.
-
-Cloning:
-
-```
-real    1m31.886s
-user    1m30.780s
-sys     0m0.101s
-```
-
-Ownership & Borrowing
-
-```
-real    0m41.395s
-user    0m40.332s
-sys     0m0.091s
-```
+There is a scene in `main` used to compare the cloning branch to the ownership and borrowing. I'm sure there is more to this than just cloning. I wonder the overhead on `Box`ing But what do I know I'm just starting to learn Rust. What I do know is the changes increased performance by 50%. I use the `time` function with Linux have yet to use benchmark in Rust.

@@ -22,10 +22,6 @@ impl Pattern for TestPattern {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
-    fn pattern_clone(&self) -> Box<dyn Pattern> {
-        Box::new((*self).clone())
-    }
-
     fn transform(&self) -> Matrix {
         matrix::IDENTITY
     }
@@ -36,5 +32,11 @@ impl Pattern for TestPattern {
 
     fn pattern_at(&self, point: Point) -> Color {
         Color::new(point.x, point.y, point.z)
+    }
+}
+
+impl Default for TestPattern {
+    fn default() -> Self {
+        Self::new()
     }
 }

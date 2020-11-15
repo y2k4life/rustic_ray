@@ -3,8 +3,6 @@ use std::any::Any;
 use std::fmt;
 
 pub trait Pattern: Send + Any + fmt::Debug {
-    fn pattern_clone(&self) -> Box<dyn Pattern>;
-
     fn pattern_eq(&self, other: &dyn Any) -> bool;
 
     fn as_any(&self) -> &dyn Any;
@@ -19,12 +17,6 @@ pub trait Pattern: Send + Any + fmt::Debug {
         let object_point = object.transform().inverse() * word_point;
         let pattern_point = self.transform().inverse() * object_point;
         self.pattern_at(pattern_point)
-    }
-}
-
-impl Clone for Box<dyn Pattern> {
-    fn clone(&self) -> Self {
-        self.pattern_clone()
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{patterns::Pattern, shapes::Shape, Color, Point, PointLight, Vector};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Material {
     pub color: Color,
     pub ambient: f64,
@@ -37,7 +37,7 @@ impl Material {
         normalv: Vector,
         in_shadow: bool,
     ) -> Color {
-        let color = match self.pattern.clone() {
+        let color = match self.pattern.as_ref() {
             Some(pattern) => pattern.pattern_at_object(object, point),
             None => self.color,
         };
@@ -59,6 +59,12 @@ impl Material {
             }
         }
         ambient + diffuse + specular
+    }
+}
+
+impl Default for Material {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

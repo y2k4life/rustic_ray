@@ -44,12 +44,6 @@ impl Shape for Sphere {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
-    /*
-    fn shape_clone(&self) -> Box<dyn Shape> {
-        Box::new((*self).clone())
-    }
-    */
-
     fn transform(&self) -> Matrix {
         self.transform
     }
@@ -58,8 +52,12 @@ impl Shape for Sphere {
         self.transform = transform;
     }
 
-    fn material(&self) -> Material {
-        self.material.clone()
+    fn material(&self) -> &Material {
+        &self.material
+    }
+
+    fn material_mut(&mut self) -> &mut Material {
+        &mut self.material
     }
 
     fn set_material(&mut self, material: Material) {
@@ -88,7 +86,7 @@ impl Shape for Sphere {
             xs.push(Intersection::new(t2, self));
         }
 
-        if xs.len() > 0 {
+        if !xs.is_empty() {
             Some(xs)
         } else {
             None
