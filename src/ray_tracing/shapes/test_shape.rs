@@ -2,7 +2,7 @@ use super::Shape;
 use crate::{ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
 use std::any::Any;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct TestShape {
     pub transform: Matrix,
     pub material: Material,
@@ -26,9 +26,11 @@ impl Shape for TestShape {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
+    /*
     fn shape_clone(&self) -> Box<dyn Shape> {
         Box::new((*self).clone())
     }
+    */
 
     fn transform(&self) -> Matrix {
         self.transform

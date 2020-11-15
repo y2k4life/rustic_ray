@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use crate::shapes::Shape;
 use crate::float_cmp;
 
-#[derive(Clone)]
+#[derive(Debug)]
 pub struct XS {
     pub t: f64,
     pub object: Box<dyn Shape>

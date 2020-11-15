@@ -104,7 +104,7 @@ fn main() {
     let light = PointLight::new(Point::new(10.0, 3.5, -10.0), Color::new(1.0, 1.0, 1.0));
     world.lights.push(light);
 
-    let mut c = Camera::new(1920, 1080, PI / 3.0);
+    let mut c = Camera::new(100, 100, PI / 3.0);
 
     c.transform = Transform::view_transformation(
         Point::new(0.0, 1.5, -4.0),
@@ -112,7 +112,7 @@ fn main() {
         Vector::new(0.0, 1.0, 0.0),
     );
 
-    c.render_to_file(world, 4, 5, "fractal.png");
+    c.render_to_file(world, 1, 5, "fractal.png");
 
     // let canvas = c.render(world, 0);
     /*

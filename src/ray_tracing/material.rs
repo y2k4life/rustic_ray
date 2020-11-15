@@ -30,7 +30,7 @@ impl Material {
 
     pub fn lighting(
         &self,
-        object: Box<dyn Shape>,
+        object: &dyn Shape,
         light: PointLight,
         point: Point,
         eyev: Vector,
@@ -78,7 +78,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let results = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -96,7 +96,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let results = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -114,7 +114,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let results = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -132,7 +132,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 10.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let results = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -150,7 +150,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 0.0, 10.0), Color::new(1.0, 1.0, 1.0));
         let results = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -169,7 +169,7 @@ mod tests {
         let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let in_shadow = true;
         let result = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             position,
             eyev,
@@ -191,7 +191,7 @@ mod tests {
         let normalv = Vector::new(0.0, 0.0, -1.0);
         let light = PointLight::new(Point::new(0.0, 0.0, -10.0), Color::new(1.0, 1.0, 1.0));
         let c1 = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             Point::new(0.9, 0.0, 0.0),
             eyev,
@@ -199,7 +199,7 @@ mod tests {
             false,
         );
         let c2 = m.lighting(
-            Box::new(Sphere::new()),
+            &Sphere::new(),
             light,
             Point::new(1.1, 0.0, 0.0),
             eyev,

@@ -4,7 +4,7 @@ use super::Shape;
 use crate::{ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
 use std::any::Any;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Sphere {
     id: Uuid,
     pub transform: Matrix,
@@ -44,9 +44,11 @@ impl Shape for Sphere {
         other.downcast_ref::<Self>().map_or(false, |a| self == a)
     }
 
+    /*
     fn shape_clone(&self) -> Box<dyn Shape> {
         Box::new((*self).clone())
     }
+    */
 
     fn transform(&self) -> Matrix {
         self.transform

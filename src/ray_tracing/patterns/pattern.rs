@@ -15,7 +15,7 @@ pub trait Pattern: Send + Any + fmt::Debug {
 
     fn pattern_at(&self, point: Point) -> Color;
 
-    fn pattern_at_object(&self, object: Box<dyn Shape>, word_point: Point) -> Color {
+    fn pattern_at_object(&self, object: &dyn Shape, word_point: Point) -> Color {
         let object_point = object.transform().inverse() * word_point;
         let pattern_point = self.transform().inverse() * object_point;
         self.pattern_at(pattern_point)

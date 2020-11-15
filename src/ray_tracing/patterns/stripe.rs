@@ -91,7 +91,7 @@ mod tests {
         let mut object = Sphere::new();
         object.set_transform(Transform::new().scaling(2.0, 2.0, 2.0).build());
         let pattern = Stripe::new(color::WHITE, color::BLACK);
-        let c = pattern.pattern_at_object(Box::new(object), Point::new(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, Point::new(1.5, 0.0, 0.0));
         assert_eq!(c, color::WHITE);
     }
 
@@ -100,7 +100,7 @@ mod tests {
         let object = Sphere::new();
         let mut pattern = Stripe::new(color::WHITE, color::BLACK);
         pattern.set_transform(Transform::new().scaling(2.0, 2.0, 2.0).build());
-        let c = pattern.pattern_at_object(Box::new(object), Point::new(1.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, Point::new(1.5, 0.0, 0.0));
         assert_eq!(c, color::WHITE);
     }
 
@@ -110,7 +110,7 @@ mod tests {
         object.set_transform(Transform::new().scaling(2.0, 2.0, 2.0).build());
         let mut pattern = Stripe::new(color::WHITE, color::BLACK);
         pattern.set_transform(Transform::new().translation(0.5, 0.0, 0.0).build());
-        let c = pattern.pattern_at_object(Box::new(object), Point::new(2.5, 0.0, 0.0));
+        let c = pattern.pattern_at_object(&object, Point::new(2.5, 0.0, 0.0));
         assert_eq!(c, color::WHITE);
     }
 }

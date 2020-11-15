@@ -3,7 +3,7 @@ use std::any::Any;
 use std::fmt;
 
 pub trait Shape: Any + fmt::Debug {
-    fn shape_clone(&self) -> Box<dyn Shape>;
+    // fn shape_clone(&self) -> Box<dyn Shape>;
 
     /// This method test for `self` and `other` shapes to be equal.
     fn shape_eq(&self, other: &dyn Any) -> bool;
@@ -41,12 +41,13 @@ pub trait Shape: Any + fmt::Debug {
     }
 }
 
+/*
 impl Clone for Box<dyn Shape> {
     fn clone(&self) -> Self {
         self.shape_clone()
     }
 }
-
+*/
 /*
 impl PartialEq for Box<dyn Shape> {
     fn eq(&self, other: &Box<dyn Shape>) -> bool {

@@ -5,7 +5,7 @@ use crate::{
 
 use super::color;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct World {
     pub objects: Vec<Box<dyn Shape>>,
     pub lights: Vec<PointLight>,
@@ -40,7 +40,7 @@ impl World {
         let in_shadow = self.is_shadow(comps.over_point);
 
         let surface = comps.object.material().lighting(
-            comps.object.shape_clone(),
+            comps.object,
             self.lights[0],
             comps.point,
             comps.eyev,
@@ -242,10 +242,10 @@ mod tests {
 
         let mut s2 = Sphere::new();
         s2.transform = Transform::new().translation(0.0, 0.0, 10.0).build();
-        w.objects.push(Box::new(s2.clone()));
+        w.objects.push(Box::new(s2));
 
         let r = Ray::new(Point::new(0.0, 0.0, 5.0), Vector::new(0.0, 0.0, 1.0));
-        let i = Intersection::new(4.0, &s2);
+        let i = Intersection::new(4.0, w.objects[1].as_ref());
         let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
         let c = w.shade_hit(&comps, 5);
         assert_eq!(c, Color::new(0.1, 0.1, 0.1));
@@ -285,12 +285,12 @@ mod tests {
         let mut shape = Plane::new();
         shape.material.reflective = 0.5;
         shape.transform = Transform::new().translation(0.0, -1.0, 0.0).build();
-        w.objects.push(shape.shape_clone());
+        w.objects.push(Box::new(shape));
         let r = Ray::new(
             Point::new(0.0, 0.0, -3.0),
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
-        let i = Intersection::new(2_f64.sqrt(), &shape);
+        let i = Intersection::new(2_f64.sqrt(), w.objects[2].as_ref());
         let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
         let color = w.shade_hit(&comps, 1);
         assert_eq!(color, Color::new(0.8767577, 0.924340789, 0.829174629));
@@ -306,11 +306,11 @@ mod tests {
         let mut lower = Plane::new();
         lower.material.reflective = 1.0;
         lower.transform = Transform::new().translation(0.0, -1.0, 0.0).build();
-        w.objects.push(lower.shape_clone());
+        w.objects.push(Box::new(lower));
         let mut upper = Plane::new();
         upper.material.reflective = 1.0;
         upper.transform = Transform::new().translation(0.0, 1.0, 0.0).build();
-        w.objects.push(upper.shape_clone());
+        w.objects.push(Box::new(upper));
         let r = Ray::new(Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 1.0, 0.0));
         w.color_at(r, 5);
     }
@@ -321,12 +321,12 @@ mod tests {
         let mut shape = Plane::new();
         shape.material.reflective = 0.5;
         shape.transform = Transform::new().translation(0.0, -1.0, 0.0).build();
-        w.objects.push(shape.shape_clone());
+        w.objects.push(Box::new(shape));
         let r = Ray::new(
             Point::new(0.0, 0.0, -3.0),
             Vector::new(0.0, -2_f64.sqrt() / 2.0, 2_f64.sqrt() / 2.0),
         );
-        let i = Intersection::new(2_f64.sqrt(), &shape);
+        let i = Intersection::new(2_f64.sqrt(), w.objects[2].as_ref());
         let comps = Intersection::prepare_computations(&i, r, &vec![i.clone()]);
         let color = w.reflected_color(&comps, 0);
         assert_eq!(color, color::BLACK);
