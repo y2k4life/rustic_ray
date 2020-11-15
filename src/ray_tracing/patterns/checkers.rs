@@ -42,7 +42,7 @@ impl Pattern for Checkers {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        if (point.x.abs().floor() + point.y.abs().floor() + point.z.abs().floor()) % 2.0 == 0.0 {
+        if (point.x.floor() + point.y.floor() + point.z.floor()) % 2.0 == 0.0 {
             self.a
         }
         else {

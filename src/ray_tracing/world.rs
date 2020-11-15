@@ -42,7 +42,7 @@ impl World {
         let surface = comps.object.material().lighting(
             comps.object.shape_clone(),
             self.lights[0],
-            comps.point,
+            comps.over_point,
             comps.eyev,
             comps.normalv,
             in_shadow,
