@@ -1,5 +1,5 @@
 use crate::float_eq;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 use rand::thread_rng;
 use rand::Rng;
 
@@ -134,6 +134,19 @@ impl Mul<Color> for f64 {
             red: other.red * self,
             green: other.green * self,
             blue: other.blue * self,
+        }
+    }
+}
+
+
+impl Div<f64> for Color {
+    type Output = Color;
+
+    fn div(self, other: f64) -> Color {
+        Color {
+            red: self.red / other,
+            green: self.green / other,
+            blue: self.blue / other,
         }
     }
 }

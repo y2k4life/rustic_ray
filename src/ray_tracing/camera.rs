@@ -13,6 +13,13 @@ pub struct Camera {
     pixel_size: f64,
 }
 
+pub enum AntiAlias {
+    Random(i32),
+    FourByFour,
+    EightByEight,
+    None
+}
+
 impl Camera {
     pub fn new(hsize: usize, vsize: usize, field_of_view: f64) -> Camera {
         let half_view = (field_of_view / 2.0).tan();
@@ -79,27 +86,47 @@ impl Camera {
         canvas
     }
 
-    pub fn render_to_file(&mut self, world: World, ss: usize, rd: usize, file_name: &str) {
+    pub fn render_to_file(&mut self, world: World, aa_type: AntiAlias, rd: usize, file_name: &str) {
         let mut img = RgbImage::new(self.hsize as u32, self.vsize as u32);
         for (x, y, pixel) in img.enumerate_pixels_mut() {
             let ray = self.ray_for_pixel(x as f64, y as f64);
 
             let mut color = world.color_at(ray, rd);
-
-            if ss > 0 {
-                for _s in 0..ss {
-                    let ro = self.get_ray_offset(x as f64, y as f64);
-                    let co = world.color_at(ro, rd);
-                    color = color + co;
+            match aa_type {
+                AntiAlias::FourByFour => {
+                    let mut f = 0.9;
+                    loop {
+                        let aa = self.get_ray_4x4(&world, color, f, x as f64, y  as f64, rd);
+                        color = aa.1;
+                        f = f - 0.2;
+                        if !aa.0 || f <= 0.0 {
+                            break;
+                        }
+                    }
                 }
+                AntiAlias::EightByEight => {
+                    let mut f = 0.9;
+                    loop {
+                        let aa = self.get_ray_8x8(&world, color, f, x as f64, y  as f64, rd);
+                        color = aa.1;
+                        f = f - 0.2;
+                        if !aa.0 || f <= 0.0 {
+                            break;
+                        }
+                    }
+                },
+                AntiAlias::Random(points) => {
+                    for _s in 0..points {
+                        let ro = self.get_ray_offset(x as f64, y as f64);
+                        let co = world.color_at(ro, rd);
+                        color = color + co;
+                    }
 
-                color = Color::new(
-                    color.red / ss as f64,
-                    color.green / ss as f64,
-                    color.blue / ss as f64,
-                );
+                    color = color / points as f64;
+                }
+                _ => ()
             }
-
+            
             let pixel_color = color.to_rgb();
             *pixel = Rgb([pixel_color.0, pixel_color.1, pixel_color.2]);
         }
@@ -107,10 +134,44 @@ impl Camera {
         img.save(file_name).unwrap();
     }
 
+    pub fn get_ray_4x4(&mut self, w: &World, color: Color, f: f64, x: f64, y: f64, d: usize) -> (bool, Color) {
+        let c1 = w.color_at(self.ray_for_pixel(x - f, y + f), d);
+        let c2 = w.color_at(self.ray_for_pixel(x + f, y + f), d);
+        let c3 = w.color_at(self.ray_for_pixel(x + f, y - f), d);
+        let c4 = w.color_at(self.ray_for_pixel(x - f, y - f), d);
+
+        if c1 != color || c2 != color || c3 != color || c4 != color {
+            (true, (color + c1 + c2 + c3 + c4) / 5.0)
+        }
+        else {
+            (false, color)
+        }
+    }
+
+    pub fn get_ray_8x8(&mut self, w: &World, color: Color, f: f64, x: f64, y: f64, d: usize) -> (bool, Color) {
+        let c1 = w.color_at(self.ray_for_pixel(x - f, y + f), d);
+        let c2 = w.color_at(self.ray_for_pixel(x + f, y + f), d);
+        let c3 = w.color_at(self.ray_for_pixel(x + f, y - f), d);
+        let c4 = w.color_at(self.ray_for_pixel(x - f, y - f), d);
+
+        let c5 = w.color_at(self.ray_for_pixel(x - f, y), d);
+        let c6 = w.color_at(self.ray_for_pixel(x, y + f), d);
+        let c7 = w.color_at(self.ray_for_pixel(x + f, y), d);
+        let c8 = w.color_at(self.ray_for_pixel(x, y - f), d);
+
+        if c1 != color || c2 != color || c3 != color || c4 != color ||
+            c5 != color || c6 != color || c7 != color || c8 != color {
+            (true, (color + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8) / 9.0)
+        }
+        else {
+            (false, color)
+        }
+    }
+
     pub fn get_ray_offset(&mut self, x: f64, y: f64) -> Ray {
         let mut rng = thread_rng();
-        let xo = rng.gen_range(-0.9, 0.9);
-        let yo = rng.gen_range(-0.9, 0.9);
+        let xo = rng.gen_range(-0.99, 0.99);
+        let yo = rng.gen_range(-0.99, 0.99);
         self.ray_for_pixel(x + xo, y + yo)
     }
 }

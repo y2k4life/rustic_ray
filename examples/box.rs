@@ -1,7 +1,4 @@
-use rustic_ray::{
-    patterns::*, ray_tracing::color, shapes::Plane, shapes::Shape, shapes::Sphere, Camera, Color,
-    Point, PointLight, Transform, Vector, World,
-};
+use rustic_ray::{ray_tracing::camera::AntiAlias, Camera, Color, Point, PointLight, Transform, Vector, World, patterns::*, ray_tracing::color, shapes::Plane, shapes::Shape, shapes::Sphere};
 use std::f64::consts::PI;
 
 // use std::{fs::File, io::Write, path::Path};
@@ -78,7 +75,7 @@ fn main() {
     let light = PointLight::new(Point::new(10.0, 3.5, -10.0), Color::new(1.0, 1.0, 1.0));
     world.lights.push(light);
 
-    let mut c = Camera::new(1920, 1080, PI / 3.0);
+    let mut c = Camera::new(614, 614, PI / 3.0);
 
     c.transform = Transform::view_transformation(
         Point::new(0.0, 1.5, -4.0),
@@ -86,7 +83,7 @@ fn main() {
         Vector::new(0.0, 1.0, 0.0),
     );
 
-    c.render_to_file(world, 4, 5, "fractal.png");
+    c.render_to_file(world, AntiAlias::None, 5, "fractal.png");
 }
 
 pub fn get_ball(x: f64, y: f64, z: f64) -> Box<dyn Shape> {
