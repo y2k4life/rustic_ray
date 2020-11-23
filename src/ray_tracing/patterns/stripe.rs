@@ -1,7 +1,7 @@
 use std::any::Any;
 
-use crate::{Color, Matrix, Point, ray_tracing::matrix};
 use super::Pattern;
+use crate::{ray_tracing::matrix, Color, Matrix, Point};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Stripe {
@@ -11,8 +11,12 @@ pub struct Stripe {
 }
 
 impl Stripe {
-    pub fn new (a: Color, b: Color) -> Stripe {
-        Stripe {a, b, transform: matrix::IDENTITY}
+    pub fn new(a: Color, b: Color) -> Stripe {
+        Stripe {
+            a,
+            b,
+            transform: matrix::IDENTITY,
+        }
     }
 }
 
@@ -36,8 +40,7 @@ impl Pattern for Stripe {
     fn pattern_at(&self, point: Point) -> Color {
         if point.x.floor() % 2.0 == 0.0 {
             self.a
-        }
-        else {
+        } else {
             self.b
         }
     }
@@ -45,8 +48,8 @@ impl Pattern for Stripe {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Point, ray_tracing::color, shapes::Shape, shapes::Sphere, Transform};
     use super::*;
+    use crate::{ray_tracing::color, shapes::Shape, shapes::Sphere, Point, Transform};
 
     #[test]
     fn creating_stripe_patter() {

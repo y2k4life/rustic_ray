@@ -1,12 +1,14 @@
+use std::any::Any;
+
 use uuid::Uuid;
 
 use super::Shape;
 use crate::{ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
-use std::any::Any;
 
 #[derive(Debug, PartialEq)]
 pub struct Sphere {
-    id: Uuid,
+    pub id: Uuid,
+    pub parent_id: Option<Uuid>,
     pub transform: Matrix,
     pub material: Material,
     pub cast_shadow: bool,
@@ -16,6 +18,7 @@ impl Sphere {
     pub fn new() -> Self {
         Self {
             id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: Material::new(),
             cast_shadow: true,
@@ -28,6 +31,7 @@ impl Sphere {
         m.transparency = 1.0;
         Self {
             id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: m,
             cast_shadow: true,
@@ -36,12 +40,24 @@ impl Sphere {
 }
 
 impl Shape for Sphere {
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn parent_id(&self) -> Option<Uuid> {
+        self.parent_id
+    }
+
+    fn set_parent_id(&mut self, id: Uuid) {
+        self.parent_id = Some(id);
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn shape_eq(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    fn shape_eq(&self, other: &dyn Shape) -> bool {
+        self.id == other.id()
     }
 
     fn transform(&self) -> Matrix {
@@ -104,7 +120,7 @@ impl Shape for Sphere {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Material, Point, Ray, Transform, Vector, ray_tracing::matrix};
+    use crate::{ray_tracing::matrix, Material, Point, Ray, Transform, Vector};
     use std::f64::consts::PI;
 
     #[test]
@@ -168,32 +184,31 @@ mod tests {
     #[test]
     fn the_normal_on_sphere_at_point_x_axis() {
         let s = Sphere::new();
-        let n = s.normal_at(Point::new(1.0, 0.0, 0.0));
+        let n = s.normal_at(Point::new(1.0, 0.0, 0.0), None);
         assert_eq!(Vector::new(1.0, 0.0, 0.0), n);
     }
 
     #[test]
     fn the_normal_on_sphere_at_point_y_axis() {
         let s = Sphere::new();
-        let n = s.normal_at(Point::new(0.0, 1.0, 0.0));
+        let n = s.normal_at(Point::new(0.0, 1.0, 0.0), None);
         assert_eq!(Vector::new(0.0, 1.0, 0.0), n);
     }
 
     #[test]
     fn the_normal_on_sphere_at_point_z_axis() {
         let s = Sphere::new();
-        let n = s.normal_at(Point::new(0.0, 0.0, 1.0));
+        let n = s.normal_at(Point::new(0.0, 0.0, 1.0), None);
         assert_eq!(Vector::new(0.0, 0.0, 1.0), n);
     }
 
     #[test]
     fn the_normal_on_sphere_at_point_non_axial() {
         let s = Sphere::new();
-        let n = s.normal_at(Point::new(
-            3_f64.sqrt() / 3.0,
-            3_f64.sqrt() / 3.0,
-            3_f64.sqrt() / 3.0,
-        ));
+        let n = s.normal_at(
+            Point::new(3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0),
+            None,
+        );
         assert_eq!(
             Vector::new(3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0),
             n
@@ -203,11 +218,10 @@ mod tests {
     #[test]
     fn the_normal_is_a_normalized_vector() {
         let s = Sphere::new();
-        let n = s.normal_at(Point::new(
-            3_f64.sqrt() / 3.0,
-            3_f64.sqrt() / 3.0,
-            3_f64.sqrt() / 3.0,
-        ));
+        let n = s.normal_at(
+            Point::new(3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0, 3_f64.sqrt() / 3.0),
+            None,
+        );
         assert_eq!(n, n.normalize());
     }
 
@@ -215,7 +229,7 @@ mod tests {
     fn computing_normal_on_translated_sphere() {
         let mut s = Sphere::new();
         s.transform = Transform::new().translation(0.0, 1.0, 0.0).build();
-        let n = s.normal_at(Point::new(0.0, 1.70711, -0.70711));
+        let n = s.normal_at(Point::new(0.0, 1.70711, -0.70711), None);
         assert_eq!(Vector::new(0.0, 0.70711, -0.70711), n);
     }
 
@@ -226,7 +240,10 @@ mod tests {
             .rotation_z(PI / 5.0)
             .scaling(1.0, 0.5, 1.0)
             .build();
-        let n = s.normal_at(Point::new(0.0, 2_f64.sqrt() / 2.0, -2_f64.sqrt() / 2.0));
+        let n = s.normal_at(
+            Point::new(0.0, 2_f64.sqrt() / 2.0, -2_f64.sqrt() / 2.0),
+            None,
+        );
         assert_eq!(Vector::new(0.0, 0.97014, -0.24254), n);
     }
 

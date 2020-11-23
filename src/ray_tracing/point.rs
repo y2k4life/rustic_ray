@@ -1,6 +1,6 @@
 use crate::float_eq;
 use crate::Vector;
-use std::ops::{Add, Mul, Div, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Point {
@@ -172,7 +172,6 @@ mod tests {
         assert_eq!(-p, Point::new(-1.0, 2.0, -3.0));
     }
 
-    
     // Chapter 1 Tuples, Points, and Vectors
     // page 8
     #[test]

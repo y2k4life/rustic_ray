@@ -22,8 +22,8 @@ impl Ray {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Point, Transform, Vector};
     use super::*;
+    use crate::{Point, Transform, Vector};
 
     #[test]
     fn creating_ray() {

@@ -31,25 +31,64 @@ impl Matrix {
                 i[col][row] = Matrix::cofactor(data, row, col, 3) / d;
             }
         }
-        
-        Self { 
-            data, 
-            inverse: i, 
-        }
+
+        Self { data, inverse: i }
     }
 
     pub fn transpose(&self) -> Self {
         Matrix {
-            data: [ 
-                [self.data[0][0], self.data[1][0], self.data[2][0], self.data[3][0]],
-                [self.data[0][1], self.data[1][1], self.data[2][1], self.data[3][1]],
-                [self.data[0][2], self.data[1][2], self.data[2][2], self.data[3][2]],
-                [self.data[0][3], self.data[1][3], self.data[2][3], self.data[3][3]]],
+            data: [
+                [
+                    self.data[0][0],
+                    self.data[1][0],
+                    self.data[2][0],
+                    self.data[3][0],
+                ],
+                [
+                    self.data[0][1],
+                    self.data[1][1],
+                    self.data[2][1],
+                    self.data[3][1],
+                ],
+                [
+                    self.data[0][2],
+                    self.data[1][2],
+                    self.data[2][2],
+                    self.data[3][2],
+                ],
+                [
+                    self.data[0][3],
+                    self.data[1][3],
+                    self.data[2][3],
+                    self.data[3][3],
+                ],
+            ],
             inverse: [
-                [self.inverse[0][0], self.inverse[1][0], self.inverse[2][0], self.inverse[3][0]],
-                [self.inverse[0][1], self.inverse[1][1], self.inverse[2][1], self.inverse[3][1]],
-                [self.inverse[0][2], self.inverse[1][2], self.inverse[2][2], self.inverse[3][2]],
-                [self.inverse[0][3], self.inverse[1][3], self.inverse[2][3], self.inverse[3][3]]],
+                [
+                    self.inverse[0][0],
+                    self.inverse[1][0],
+                    self.inverse[2][0],
+                    self.inverse[3][0],
+                ],
+                [
+                    self.inverse[0][1],
+                    self.inverse[1][1],
+                    self.inverse[2][1],
+                    self.inverse[3][1],
+                ],
+                [
+                    self.inverse[0][2],
+                    self.inverse[1][2],
+                    self.inverse[2][2],
+                    self.inverse[3][2],
+                ],
+                [
+                    self.inverse[0][3],
+                    self.inverse[1][3],
+                    self.inverse[2][3],
+                    self.inverse[3][3],
+                ],
+            ],
         }
     }
 
@@ -90,7 +129,7 @@ impl Matrix {
                 m[nri][nci] = a[*ri][*ci];
             }
         }
-        
+
         m
     }
 
@@ -199,8 +238,8 @@ impl PartialEq for Matrix {
 
 #[cfg(test)]
 mod tests {
-    use crate::float_eq;
     use super::{Matrix, IDENTITY};
+    use crate::float_eq;
 
     #[test]
     fn determinant() {
@@ -539,18 +578,18 @@ mod tests {
         }
 
         let t = a.transpose();
-        
+
         let te = [
             [-0.15385, -0.07692, 0.35897, -0.69231],
             [-0.15385, 0.12308, 0.35897, -0.69231],
             [-0.28205, 0.02564, 0.43590, -0.76923],
-            [-0.53846, 0.03077, 0.92308, -1.92308]];
+            [-0.53846, 0.03077, 0.92308, -1.92308],
+        ];
 
         for row in 0..4 {
             for col in 0..4 {
                 assert_eq!(true, float_eq(t.inverse[row][col], te[row][col]));
             }
         }
-        
     }
 }

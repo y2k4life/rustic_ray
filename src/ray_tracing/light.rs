@@ -17,8 +17,8 @@ impl PointLight {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Color, Point};
     use super::*;
+    use crate::{Color, Point};
 
     #[test]
     fn point_light_position_intensity() {

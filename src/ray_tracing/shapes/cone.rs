@@ -1,9 +1,19 @@
+use uuid::Uuid;
+
 use super::Shape;
-use crate::{EPSILON, Intersection, Material, Matrix, Point, Ray, Vector, float_eq, ray_tracing::matrix::IDENTITY};
-use std::{any::Any, f64::{INFINITY, NEG_INFINITY}};
+use crate::{
+    float_eq, ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector,
+    EPSILON,
+};
+use std::{
+    any::Any,
+    f64::{INFINITY, NEG_INFINITY},
+};
 
 #[derive(Debug)]
 pub struct Cone {
+    id: Uuid,
+    pub parent_id: Option<Uuid>,
     pub transform: Matrix,
     pub material: Material,
     pub maximum: f64,
@@ -14,6 +24,8 @@ pub struct Cone {
 impl Cone {
     pub fn new() -> Cone {
         Cone {
+            id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: Material::new(),
             minimum: NEG_INFINITY,
@@ -49,20 +61,31 @@ impl Cone {
 
         if xs.is_empty() {
             None
-        }
-        else {
+        } else {
             Some(xs)
         }
     }
 }
 
 impl Shape for Cone {
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn parent_id(&self) -> Option<Uuid> {
+        self.parent_id
+    }
+
+    fn set_parent_id(&mut self, id: Uuid) {
+        self.parent_id = Some(id);
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn shape_eq(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    fn shape_eq(&self, other: &dyn Shape) -> bool {
+        self.id == other.id()
     }
 
     fn transform(&self) -> Matrix {
@@ -90,9 +113,8 @@ impl Shape for Cone {
 
         let a = ray.direction.x.powi(2) - ray.direction.y.powi(2) + ray.direction.z.powi(2);
 
-        let b = 2.0 * ray.origin.x * ray.direction.x -
-            2.0 * ray.origin.y * ray.direction.y +
-            2.0 * ray.origin.z * ray.direction.z;
+        let b = 2.0 * ray.origin.x * ray.direction.x - 2.0 * ray.origin.y * ray.direction.y
+            + 2.0 * ray.origin.z * ray.direction.z;
 
         let c = ray.origin.x.powi(2) - ray.origin.y.powi(2) + ray.origin.z.powi(2);
 
@@ -101,7 +123,7 @@ impl Shape for Cone {
         }
 
         if float_eq(a, 0.0) && b != 0.0 {
-            xs.push(Intersection::new(-c/(2.0 * b), self));
+            xs.push(Intersection::new(-c / (2.0 * b), self));
         }
 
         let disc = b.powi(2) - 4.0 * a * c;
@@ -109,7 +131,10 @@ impl Shape for Cone {
             return None;
         }
 
-        let mut t = ((-b - disc.sqrt()) / (2.0 * a), (-b + disc.sqrt()) / (2.0 * a));
+        let mut t = (
+            (-b - disc.sqrt()) / (2.0 * a),
+            (-b + disc.sqrt()) / (2.0 * a),
+        );
 
         if t.0 > t.1 {
             t = (t.1, t.0);
@@ -131,13 +156,12 @@ impl Shape for Cone {
                     xs.push(i)
                 }
             }
-            _ => ()
+            _ => (),
         }
 
         if xs.is_empty() {
             None
-        }
-        else {
+        } else {
             Some(xs)
         }
     }
@@ -167,8 +191,8 @@ impl PartialEq for Cone {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Point, Ray, Vector, shapes::Shape};
     use super::*;
+    use crate::{shapes::Shape, Point, Ray, Vector};
 
     // Chapter 13 Cylinders
     // Page 189
@@ -176,9 +200,24 @@ mod tests {
     fn a_ray_intersects_a_cone_with_a_ray() {
         let c = Cone::new();
         let data = vec![
-            (Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0), 5.0, 5.0),
-            (Point::new(0.0, 0.0, -5.0), Vector::new(1.0, 1.0, 1.0), 8.66025, 8.66025),
-            (Point::new(1.0, 1.0, -5.0), Vector::new(-0.5, -1.0, 1.0), 4.55006, 49.44994),
+            (
+                Point::new(0.0, 0.0, -5.0),
+                Vector::new(0.0, 0.0, 1.0),
+                5.0,
+                5.0,
+            ),
+            (
+                Point::new(0.0, 0.0, -5.0),
+                Vector::new(1.0, 1.0, 1.0),
+                8.66025,
+                8.66025,
+            ),
+            (
+                Point::new(1.0, 1.0, -5.0),
+                Vector::new(-0.5, -1.0, 1.0),
+                4.55006,
+                49.44994,
+            ),
         ];
         for rec in data {
             let direction = rec.1;
@@ -232,8 +271,12 @@ mod tests {
         let cone = Cone::new();
         let data = vec![
             (Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 0.0, 0.0)),
-            (Point::new(1.0, 1.0, 1.0), Vector::new(1.0, -2_f64.sqrt(), 1.0)),
-            (Point::new(-1.0, -1.0, 0.0), Vector::new(-1.0, 1.0, 0.0))];
+            (
+                Point::new(1.0, 1.0, 1.0),
+                Vector::new(1.0, -2_f64.sqrt(), 1.0),
+            ),
+            (Point::new(-1.0, -1.0, 0.0), Vector::new(-1.0, 1.0, 0.0)),
+        ];
         for rec in data {
             let n = cone.local_normal_at(rec.0);
             assert_eq!(n, rec.1);

@@ -4,8 +4,7 @@ use super::Pattern;
 use crate::{ray_tracing::matrix, Color, Matrix, Point};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct TestPattern {
-}
+pub struct TestPattern {}
 
 impl TestPattern {
     pub fn new() -> TestPattern {
@@ -26,9 +25,7 @@ impl Pattern for TestPattern {
         matrix::IDENTITY
     }
 
-    fn set_transform(&mut self, _transform: Matrix) {
-        
-    }
+    fn set_transform(&mut self, _transform: Matrix) {}
 
     fn pattern_at(&self, point: Point) -> Color {
         Color::new(point.x, point.y, point.z)

@@ -1,9 +1,14 @@
+use std::any::Any;
+
+use uuid::Uuid;
+
 use super::Shape;
 use crate::{ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
-use std::any::Any;
 
 #[derive(Debug)]
 pub struct TestShape {
+    pub id: Uuid,
+    pub parent_id: Option<Uuid>,
     pub transform: Matrix,
     pub material: Material,
 }
@@ -11,6 +16,8 @@ pub struct TestShape {
 impl TestShape {
     pub fn new() -> TestShape {
         TestShape {
+            id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: Material::new(),
         }
@@ -18,12 +25,24 @@ impl TestShape {
 }
 
 impl Shape for TestShape {
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn parent_id(&self) -> Option<Uuid> {
+        self.parent_id
+    }
+
+    fn set_parent_id(&mut self, id: Uuid) {
+        self.parent_id = Some(id);
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn shape_eq(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    fn shape_eq(&self, other: &dyn Shape) -> bool {
+        self.id == other.id()
     }
 
     fn transform(&self) -> Matrix {
@@ -54,8 +73,7 @@ impl Shape for TestShape {
             Intersection::new(ray.direction.x, self),
             Intersection::new(ray.direction.y, self),
             Intersection::new(ray.direction.z, self),
-            ])
-        
+        ])
     }
 
     fn local_normal_at(&self, point: Point) -> Vector {
@@ -71,8 +89,8 @@ impl PartialEq for TestShape {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Point, Ray, Transform, Vector, shapes::Shape};
     use super::TestShape;
+    use crate::{shapes::Shape, Point, Ray, Transform, Vector};
 
     #[test]
     fn name() {
@@ -108,7 +126,7 @@ mod tests {
     fn computing_normal_on_translated_shape() {
         let mut s = TestShape::new();
         s.set_transform(Transform::new().translation(0.0, 1.0, 0.0).build());
-        let n = s.normal_at(Point::new(0.0, 1.7071, -0.70711));
+        let n = s.normal_at(Point::new(0.0, 1.7071, -0.70711), None);
         assert_eq!(n, Vector::new(0.0, 0.70711, -0.70711));
     }
 }

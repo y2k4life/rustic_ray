@@ -11,13 +11,14 @@ pub use ray_tracing::matrix::Matrix;
 pub use ray_tracing::patterns;
 pub use ray_tracing::point::Point;
 pub use ray_tracing::ray::Ray;
+pub use ray_tracing::shape_container::ShapeContainer;
 pub use ray_tracing::shapes;
 pub use ray_tracing::transform::Transform;
 pub use ray_tracing::vector::Vector;
 pub use ray_tracing::world::World;
 pub use ray_tracing::xs::XS;
 
-use std::{cmp::Ordering};
+use std::cmp::Ordering;
 
 pub const EPSILON: f64 = 0.0001;
 

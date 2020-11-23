@@ -162,8 +162,8 @@ mod tests {
     fn subtracting_a_vector_from_the_zero_vector() {
         let zero = Vector::new(0.0, 0.0, 0.0);
         let v = Vector::new(1.0, -2.0, 3.0);
-        
-        assert_eq!(zero-v, Vector::new(-1.0, 2.0, -3.0));
+
+        assert_eq!(zero - v, Vector::new(-1.0, 2.0, -3.0));
     }
 
     // Chapter 1 Tuples, Points, and Vectors

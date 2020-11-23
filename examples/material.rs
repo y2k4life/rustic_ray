@@ -1,6 +1,9 @@
-use std::{fs::File, path::Path, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
-use rustic_ray::{Canvas, Color, Intersection, Point, PointLight, Ray, shapes::{Shape, Sphere}};
+use rustic_ray::{
+    shapes::{Shape, Sphere},
+    Canvas, Color, Intersection, Point, PointLight, Ray,
+};
 
 fn main() {
     for i in 0..9 {
@@ -23,7 +26,7 @@ fn material(i: usize, a: f64) {
 
     let mut sphere = Sphere::new();
     sphere.material.color = Color::new(1.0, 0.2, 1.0);
-    
+
     // changes this to be the range value
     sphere.material.ambient = a as f64;
 
@@ -40,20 +43,20 @@ fn material(i: usize, a: f64) {
             let ray = Ray::new(ray_origin, direction);
 
             match sphere.local_intersect(ray) {
-                Some(xs) => {
-                    match Intersection::hit(&xs) {
-                        Some(hit) => {
-                            let point = ray.position(hit.t);
-                            let normal = hit.object.normal_at(point);
-                            let eye = -ray.direction;
+                Some(xs) => match Intersection::hit(&xs) {
+                    Some(hit) => {
+                        let point = ray.position(hit.t);
+                        let normal = hit.object.normal_at(point, None);
+                        let eye = -ray.direction;
 
-                            let color = sphere.material.lighting(&sphere, light, point, eye, normal, false);
-                            canvas.pixels[x][y] = color;
-                        }
-                        _ => ()
+                        let color = sphere
+                            .material
+                            .lighting(&sphere, light, point, eye, normal, false);
+                        canvas.pixels[x][y] = color;
                     }
+                    _ => (),
                 },
-                None => ()
+                None => (),
             }
         }
     }

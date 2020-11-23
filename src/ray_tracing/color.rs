@@ -1,7 +1,7 @@
 use crate::float_eq;
-use std::ops::{Add, Div, Mul, Neg, Sub};
 use rand::thread_rng;
 use rand::Rng;
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub const BLACK: Color = Color {
     red: 0.0,
@@ -34,7 +34,11 @@ impl Color {
     }
 
     pub fn new_rgb(red: i32, green: i32, blue: i32) -> Self {
-        Color { red: red as f64 / 255.0, green: green as f64 / 255.0, blue: blue as f64 / 255.0 }
+        Color {
+            red: red as f64 / 255.0,
+            green: green as f64 / 255.0,
+            blue: blue as f64 / 255.0,
+        }
     }
 
     pub fn random() -> Self {
@@ -138,7 +142,6 @@ impl Mul<Color> for f64 {
     }
 }
 
-
 impl Div<f64> for Color {
     type Output = Color;
 
@@ -174,7 +177,7 @@ impl PartialEq for Color {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn colors_are_n0_5_0_4_1_7() {
         let c = Color::new(-0.5, 0.4, 1.7);

@@ -8,6 +8,7 @@ pub mod matrix;
 pub mod patterns;
 pub mod point;
 pub mod ray;
+pub mod shape_container;
 pub mod shapes;
 pub mod transform;
 pub mod vector;

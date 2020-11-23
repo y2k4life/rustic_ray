@@ -1,4 +1,7 @@
-use rustic_ray::{ray_tracing::camera::AntiAlias, Camera, Color, Point, PointLight, Transform, Vector, World, patterns::*, ray_tracing::color, shapes::Plane, shapes::Shape, shapes::Sphere};
+use rustic_ray::{
+    patterns::*, ray_tracing::camera::AntiAlias, ray_tracing::color, shapes::Plane, shapes::Shape,
+    shapes::Sphere, Camera, Color, Point, PointLight, Transform, Vector, World,
+};
 use std::f64::consts::PI;
 
 // use std::{fs::File, io::Write, path::Path};
@@ -15,13 +18,13 @@ fn main() {
 
     let mut floor = Plane::new();
     floor.material.pattern = Some(Box::new(pattern));
-    world.objects.push(Box::new(floor));
+    world.add_shape(Box::new(floor));
 
     let mut ceiling = Plane::new();
     ceiling.transform = Transform::new().translation(0.0, 10.0, 0.0).build();
     ceiling.material.reflective = 0.1;
     ceiling.material.pattern = Some(Box::new(pattern));
-    world.objects.push(Box::new(ceiling));
+    world.add_shape(Box::new(ceiling));
 
     let mut checkers = Checkers::new(color::WHITE, color::BLACK);
     checkers.transform = Transform::new().translation(10.0, 0.0, 10.0).build();
@@ -33,7 +36,7 @@ fn main() {
         .translation(0.0, 0.0, 10.0)
         .build();
     front_wall.material.pattern = Some(Box::new(checkers));
-    world.objects.push(Box::new(front_wall));
+    world.add_shape(Box::new(front_wall));
 
     let mut right_wall = Plane::new();
     right_wall.transform = Transform::new()
@@ -42,15 +45,15 @@ fn main() {
         .translation(10.0, 0.0, 0.0)
         .build();
     right_wall.material.pattern = Some(Box::new(checkers));
-    world.objects.push(Box::new(right_wall));
-    
+    world.add_shape(Box::new(right_wall));
+
     let mut ball1 = Sphere::new();
     ball1.transform = Transform::new().translation(-0.5, 1.0, -1.0).build();
     ball1.material.transparency = 1.0;
     ball1.material.refractive_index = 1.5;
     ball1.material.ambient = 0.1;
     ball1.material.diffuse = 0.05;
-    world.objects.push(Box::new(ball1));
+    world.add_shape(Box::new(ball1));
 
     let mut ball2 = Sphere::new();
     ball2.transform = Transform::new()
@@ -60,7 +63,7 @@ fn main() {
     ball2.material.color = Color::new(1.0, 0.0, 0.0);
     ball2.material.ambient = 0.5;
     ball2.material.reflective = 0.25;
-    world.objects.push(Box::new(ball2));
+    world.add_shape(Box::new(ball2));
 
     let mut ball3 = Sphere::new();
     ball3.transform = Transform::new()
@@ -70,7 +73,7 @@ fn main() {
     ball3.material.color = Color::new(0.0, 1.0, 0.0);
     ball3.material.ambient = 0.8;
     ball3.material.reflective = 1.0;
-    world.objects.push(Box::new(ball3));
+    world.add_shape(Box::new(ball3));
 
     let light = PointLight::new(Point::new(10.0, 3.5, -10.0), Color::new(1.0, 1.0, 1.0));
     world.lights.push(light);
@@ -83,7 +86,7 @@ fn main() {
         Vector::new(0.0, 1.0, 0.0),
     );
 
-    c.render_to_file(world, AntiAlias::None, 5, "fractal.png");
+    c.render_to_file(&world, AntiAlias::None, 5, "fractal.png");
 }
 
 pub fn get_ball(x: f64, y: f64, z: f64) -> Box<dyn Shape> {

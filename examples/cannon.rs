@@ -1,4 +1,4 @@
-use std::{fs::File, path::Path, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
 use rustic_ray::{Canvas, Color, Matrix, Point, Vector};
 

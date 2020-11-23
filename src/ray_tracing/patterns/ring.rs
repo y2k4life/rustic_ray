@@ -1,5 +1,5 @@
 use super::Pattern;
-use crate::{Color, Matrix, Point, ray_tracing::matrix};
+use crate::{ray_tracing::matrix, Color, Matrix, Point};
 use std::any::Any;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -60,6 +60,9 @@ mod tests {
         assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 0.0)), color::WHITE);
         assert_eq!(pattern.pattern_at(Point::new(1.0, 0.0, 0.0)), color::BLACK);
         assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 1.0)), color::BLACK);
-        assert_eq!(pattern.pattern_at(Point::new(0.708, 0.0, 0.708)), color::BLACK);
+        assert_eq!(
+            pattern.pattern_at(Point::new(0.708, 0.0, 0.708)),
+            color::BLACK
+        );
     }
 }

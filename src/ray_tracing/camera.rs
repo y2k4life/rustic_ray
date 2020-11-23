@@ -17,7 +17,7 @@ pub enum AntiAlias {
     Random(i32),
     FourByFour,
     EightByEight,
-    None
+    None,
 }
 
 impl Camera {
@@ -86,7 +86,13 @@ impl Camera {
         canvas
     }
 
-    pub fn render_to_file(&mut self, world: World, aa_type: AntiAlias, rd: usize, file_name: &str) {
+    pub fn render_to_file(
+        &mut self,
+        world: &World,
+        aa_type: AntiAlias,
+        rd: usize,
+        file_name: &str,
+    ) {
         let mut img = RgbImage::new(self.hsize as u32, self.vsize as u32);
         for (x, y, pixel) in img.enumerate_pixels_mut() {
             let ray = self.ray_for_pixel(x as f64, y as f64);
@@ -96,7 +102,7 @@ impl Camera {
                 AntiAlias::FourByFour => {
                     let mut f = 0.9;
                     loop {
-                        let aa = self.get_ray_4x4(&world, color, f, x as f64, y  as f64, rd);
+                        let aa = self.get_ray_4x4(&world, color, f, x as f64, y as f64, rd);
                         color = aa.1;
                         f = f - 0.2;
                         if !aa.0 || f <= 0.0 {
@@ -107,14 +113,14 @@ impl Camera {
                 AntiAlias::EightByEight => {
                     let mut f = 0.9;
                     loop {
-                        let aa = self.get_ray_8x8(&world, color, f, x as f64, y  as f64, rd);
+                        let aa = self.get_ray_8x8(&world, color, f, x as f64, y as f64, rd);
                         color = aa.1;
                         f = f - 0.2;
                         if !aa.0 || f <= 0.0 {
                             break;
                         }
                     }
-                },
+                }
                 AntiAlias::Random(points) => {
                     for _s in 0..points {
                         let ro = self.get_ray_offset(x as f64, y as f64);
@@ -124,9 +130,9 @@ impl Camera {
 
                     color = color / points as f64;
                 }
-                _ => ()
+                _ => (),
             }
-            
+
             let pixel_color = color.to_rgb();
             *pixel = Rgb([pixel_color.0, pixel_color.1, pixel_color.2]);
         }
@@ -134,7 +140,15 @@ impl Camera {
         img.save(file_name).unwrap();
     }
 
-    pub fn get_ray_4x4(&mut self, w: &World, color: Color, f: f64, x: f64, y: f64, d: usize) -> (bool, Color) {
+    pub fn get_ray_4x4(
+        &mut self,
+        w: &World,
+        color: Color,
+        f: f64,
+        x: f64,
+        y: f64,
+        d: usize,
+    ) -> (bool, Color) {
         let c1 = w.color_at(self.ray_for_pixel(x - f, y + f), d);
         let c2 = w.color_at(self.ray_for_pixel(x + f, y + f), d);
         let c3 = w.color_at(self.ray_for_pixel(x + f, y - f), d);
@@ -142,13 +156,20 @@ impl Camera {
 
         if c1 != color || c2 != color || c3 != color || c4 != color {
             (true, (color + c1 + c2 + c3 + c4) / 5.0)
-        }
-        else {
+        } else {
             (false, color)
         }
     }
 
-    pub fn get_ray_8x8(&mut self, w: &World, color: Color, f: f64, x: f64, y: f64, d: usize) -> (bool, Color) {
+    pub fn get_ray_8x8(
+        &mut self,
+        w: &World,
+        color: Color,
+        f: f64,
+        x: f64,
+        y: f64,
+        d: usize,
+    ) -> (bool, Color) {
         let c1 = w.color_at(self.ray_for_pixel(x - f, y + f), d);
         let c2 = w.color_at(self.ray_for_pixel(x + f, y + f), d);
         let c3 = w.color_at(self.ray_for_pixel(x + f, y - f), d);
@@ -159,11 +180,17 @@ impl Camera {
         let c7 = w.color_at(self.ray_for_pixel(x + f, y), d);
         let c8 = w.color_at(self.ray_for_pixel(x, y - f), d);
 
-        if c1 != color || c2 != color || c3 != color || c4 != color ||
-            c5 != color || c6 != color || c7 != color || c8 != color {
+        if c1 != color
+            || c2 != color
+            || c3 != color
+            || c4 != color
+            || c5 != color
+            || c6 != color
+            || c7 != color
+            || c8 != color
+        {
             (true, (color + c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8) / 9.0)
-        }
-        else {
+        } else {
             (false, color)
         }
     }

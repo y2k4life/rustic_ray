@@ -37,7 +37,7 @@ impl Pattern for Gradient {
     }
 
     fn pattern_at(&self, point: Point) -> Color {
-        self.a + (self.b - self.a) * (point.x - point.x.floor()) 
+        self.a + (self.b - self.a) * (point.x - point.x.floor())
     }
 }
 
@@ -45,13 +45,22 @@ impl Pattern for Gradient {
 mod tests {
     use super::*;
     use crate::ray_tracing::color;
-    
+
     #[test]
     fn gradient_linearly_interpolates_between_colors() {
         let pattern = Gradient::new(color::WHITE, color::BLACK);
         assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 0.0)), color::WHITE);
-        assert_eq!(pattern.pattern_at(Point::new(0.25, 0.0, 0.0)), Color::new(0.75, 0.75, 0.75));
-        assert_eq!(pattern.pattern_at(Point::new(0.5, 0.0, 0.0)), Color::new(0.5, 0.5, 0.5));
-        assert_eq!(pattern.pattern_at(Point::new(0.75, 0.0, 0.0)), Color::new(0.25, 0.25, 0.25));
+        assert_eq!(
+            pattern.pattern_at(Point::new(0.25, 0.0, 0.0)),
+            Color::new(0.75, 0.75, 0.75)
+        );
+        assert_eq!(
+            pattern.pattern_at(Point::new(0.5, 0.0, 0.0)),
+            Color::new(0.5, 0.5, 0.5)
+        );
+        assert_eq!(
+            pattern.pattern_at(Point::new(0.75, 0.0, 0.0)),
+            Color::new(0.25, 0.25, 0.25)
+        );
     }
 }

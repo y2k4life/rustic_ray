@@ -1,6 +1,13 @@
-use std::{f64::consts::PI};
+use std::f64::consts::PI;
 
-use rustic_ray::{Camera, Color, shapes::Cone, Point, PointLight, Transform, Vector, World, patterns::Checkers, ray_tracing::{camera::AntiAlias, color}, shapes::Cylinder, shapes::Plane};
+use rustic_ray::{
+    patterns::Checkers,
+    ray_tracing::{camera::AntiAlias, color},
+    shapes::Cone,
+    shapes::Cylinder,
+    shapes::Plane,
+    Camera, Color, Point, PointLight, Transform, Vector, World,
+};
 
 fn main() {
     let mut world = World::new();
@@ -17,7 +24,7 @@ fn main() {
 
     let mut floor = Plane::new();
     floor.material.pattern = Some(Box::new(pattern));
-    world.objects.push(Box::new(floor));
+    world.add_shape(Box::new(floor));
 
     let mut front_wall = Plane::new();
     front_wall.transform = Transform::new()
@@ -26,7 +33,7 @@ fn main() {
         .translation(0.0, 0.0, 10.0)
         .build();
     front_wall.material.pattern = Some(Box::new(checkers));
-    world.objects.push(Box::new(front_wall));
+    world.add_shape(Box::new(front_wall));
 
     let mut right_wall = Plane::new();
     right_wall.transform = Transform::new()
@@ -35,7 +42,7 @@ fn main() {
         .translation(10.0, 0.0, 0.0)
         .build();
     right_wall.material.pattern = Some(Box::new(checkers));
-    world.objects.push(Box::new(right_wall));
+    world.add_shape(Box::new(right_wall));
 
     let mut c1 = Cylinder::new();
     c1.maximum = 2.0;
@@ -60,8 +67,9 @@ fn main() {
     cone.material.color = Color::new(0.25, 0.0, 0.0);
     cone.transform = Transform::new()
         .rotation_z(PI / 2.0)
-        .translation(0.0, 1.0, 0.0).build();
-    world.objects.push(Box::new(cone));
+        .translation(0.0, 1.0, 0.0)
+        .build();
+    world.add_shape(Box::new(cone));
 
     let light = PointLight::new(Point::new(10.0, 3.5, -10.0), Color::new(1.0, 1.0, 1.0));
     world.lights.push(light);
@@ -74,5 +82,5 @@ fn main() {
         Vector::new(0.0, 1.0, 0.0),
     );
 
-    c.render_to_file(world, AntiAlias::None, 5, "cylinder.png");
+    c.render_to_file(&world, AntiAlias::None, 5, "cylinder.png");
 }

@@ -1,4 +1,4 @@
-use crate::{Color, Matrix, Point, shapes::Shape};
+use crate::{shapes::Shape, Color, Matrix, Point};
 use std::any::Any;
 use std::fmt;
 

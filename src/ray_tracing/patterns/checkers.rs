@@ -40,8 +40,7 @@ impl Pattern for Checkers {
     fn pattern_at(&self, point: Point) -> Color {
         if (point.x.floor() + point.y.floor() + point.z.floor()) % 2.0 == 0.0 {
             self.a
-        }
-        else {
+        } else {
             self.b
         }
     }
@@ -65,14 +64,17 @@ mod tests {
         let pattern = Checkers::new(color::WHITE, color::BLACK);
         assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 0.0)), color::WHITE);
         assert_eq!(pattern.pattern_at(Point::new(0.0, 0.99, 0.0)), color::WHITE);
-        assert_eq!(pattern.pattern_at(Point::new(0.0, 1.01, 0.708)), color::BLACK);
+        assert_eq!(
+            pattern.pattern_at(Point::new(0.0, 1.01, 0.708)),
+            color::BLACK
+        );
     }
 
     #[test]
     fn checkers_should_repeat_in_z() {
         let pattern = Checkers::new(color::WHITE, color::BLACK);
-        assert_eq!(pattern.pattern_at(Point::new(0.0,  0.0, 0.0)), color::WHITE);
-        assert_eq!(pattern.pattern_at(Point::new(0.0,  0.0, 0.99)), color::WHITE);
-        assert_eq!(pattern.pattern_at(Point::new(0.0,  0.0, 1.01)), color::BLACK);
+        assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 0.0)), color::WHITE);
+        assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 0.99)), color::WHITE);
+        assert_eq!(pattern.pattern_at(Point::new(0.0, 0.0, 1.01)), color::BLACK);
     }
 }

@@ -1,9 +1,19 @@
+use uuid::Uuid;
+
 use super::Shape;
-use crate::{EPSILON, Intersection, Material, Matrix, Point, Ray, Vector, float_eq, ray_tracing::matrix::IDENTITY};
-use std::{any::Any, f64::{INFINITY, NEG_INFINITY}};
+use crate::{
+    float_eq, ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector,
+    EPSILON,
+};
+use std::{
+    any::Any,
+    f64::{INFINITY, NEG_INFINITY},
+};
 
 #[derive(Debug)]
 pub struct Cylinder {
+    pub id: Uuid,
+    pub parent_id: Option<Uuid>,
     pub transform: Matrix,
     pub material: Material,
     pub maximum: f64,
@@ -14,6 +24,8 @@ pub struct Cylinder {
 impl Cylinder {
     pub fn new() -> Cylinder {
         Cylinder {
+            id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: Material::new(),
             minimum: NEG_INFINITY,
@@ -48,20 +60,31 @@ impl Cylinder {
 
         if xs.is_empty() {
             None
-        }
-        else {
+        } else {
             Some(xs)
         }
     }
 }
 
 impl Shape for Cylinder {
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn parent_id(&self) -> Option<Uuid> {
+        self.parent_id
+    }
+
+    fn set_parent_id(&mut self, id: Uuid) {
+        self.parent_id = Some(id);
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn shape_eq(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    fn shape_eq(&self, other: &dyn Shape) -> bool {
+        self.id == other.id()
     }
 
     fn transform(&self) -> Matrix {
@@ -91,8 +114,7 @@ impl Shape for Cylinder {
             return self.intersect_caps(ray);
         }
 
-        let b = 2.0 * ray.origin.x * ray.direction.x +
-            2.0 * ray.origin.z * ray.direction.z;
+        let b = 2.0 * ray.origin.x * ray.direction.x + 2.0 * ray.origin.z * ray.direction.z;
         let c = ray.origin.x.powi(2) + ray.origin.z.powi(2) - 1.0;
 
         let disc = b.powi(2) - 4.0 * a * c;
@@ -101,7 +123,10 @@ impl Shape for Cylinder {
             return None;
         }
 
-        let mut t = ((-b - disc.sqrt()) / (2.0 * a), (-b + disc.sqrt()) / (2.0 * a));
+        let mut t = (
+            (-b - disc.sqrt()) / (2.0 * a),
+            (-b + disc.sqrt()) / (2.0 * a),
+        );
 
         if t.0 > t.1 {
             t = (t.1, t.0);
@@ -125,13 +150,12 @@ impl Shape for Cylinder {
                     xs.push(i)
                 }
             }
-            _ => ()
+            _ => (),
         }
 
         if xs.is_empty() {
             None
-        }
-        else {
+        } else {
             Some(xs)
         }
     }
@@ -159,8 +183,8 @@ impl PartialEq for Cylinder {
 mod tests {
     use std::f64::{INFINITY, NEG_INFINITY};
 
-    use crate::{Point, Ray, Vector, shapes::Shape};
     use super::*;
+    use crate::{shapes::Shape, Point, Ray, Vector};
 
     // Chapter 13 Cylinders
     // Page 178 & 179
@@ -170,7 +194,8 @@ mod tests {
         let data = vec![
             (Point::new(1.0, 0.0, 0.0), Vector::new(0.0, 1.0, 0.0)),
             (Point::new(0.0, 0.0, 0.0), Vector::new(0.0, 1.0, 0.0)),
-            (Point::new(0.0, 0.0, -5.0), Vector::new(1.0, 1.0, 1.0))];
+            (Point::new(0.0, 0.0, -5.0), Vector::new(1.0, 1.0, 1.0)),
+        ];
         for rec in data {
             let direction = rec.1;
             let r = Ray::new(rec.0, direction.normalize());
@@ -185,9 +210,24 @@ mod tests {
     fn a_ray_intersects_a_cylinder() {
         let c = Cylinder::new();
         let data = vec![
-            (Point::new(1.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0), 5.0, 5.0), 
-            (Point::new(0.0, 0.0, -5.0), Vector::new(0.0, 0.0, 1.0), 4.0, 6.0),
-            (Point::new(0.5, 0.0, -5.0), Vector::new(0.1, 1.0, 1.0), 6.80798, 7.08872),
+            (
+                Point::new(1.0, 0.0, -5.0),
+                Vector::new(0.0, 0.0, 1.0),
+                5.0,
+                5.0,
+            ),
+            (
+                Point::new(0.0, 0.0, -5.0),
+                Vector::new(0.0, 0.0, 1.0),
+                4.0,
+                6.0,
+            ),
+            (
+                Point::new(0.5, 0.0, -5.0),
+                Vector::new(0.1, 1.0, 1.0),
+                6.80798,
+                7.08872,
+            ),
         ];
         for rec in data {
             let direction = rec.1;
@@ -208,7 +248,8 @@ mod tests {
             (Point::new(1.0, 0.0, 0.0), Vector::new(1.0, 0.0, 0.0)),
             (Point::new(0.0, 5.0, -1.0), Vector::new(0.0, 0.0, -1.0)),
             (Point::new(0.0, -2.0, 1.0), Vector::new(0.0, 0.0, 1.0)),
-            (Point::new(-1.0, 1.0, 0.0), Vector::new(-1.0, 0.0, 0.0))];
+            (Point::new(-1.0, 1.0, 0.0), Vector::new(-1.0, 0.0, 0.0)),
+        ];
         for rec in data {
             let p = rec.0;
             let normal = c.local_normal_at(p);
@@ -245,7 +286,7 @@ mod tests {
             let r = Ray::new(rec.0, direction.normalize());
             match c.local_intersect(r) {
                 Some(xs) => assert_eq!(rec.2, xs.len()),
-                None => assert_eq!(rec.2, 0)
+                None => assert_eq!(rec.2, 0),
             }
         }
     }

@@ -1,9 +1,16 @@
 use std::any::Any;
-use crate::{EPSILON, ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector};
+
+use uuid::Uuid;
+
 use super::Shape;
+use crate::{
+    ray_tracing::matrix::IDENTITY, Intersection, Material, Matrix, Point, Ray, Vector, EPSILON,
+};
 
 #[derive(Debug)]
 pub struct Plane {
+    id: Uuid,
+    pub parent_id: Option<Uuid>,
     pub transform: Matrix,
     pub material: Material,
     pub cast_shadow: bool,
@@ -12,6 +19,8 @@ pub struct Plane {
 impl Plane {
     pub fn new() -> Plane {
         Plane {
+            id: Uuid::new_v4(),
+            parent_id: None,
             transform: IDENTITY,
             material: Material::new(),
             cast_shadow: true,
@@ -20,12 +29,24 @@ impl Plane {
 }
 
 impl Shape for Plane {
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn parent_id(&self) -> Option<Uuid> {
+        self.parent_id
+    }
+
+    fn set_parent_id(&mut self, id: Uuid) {
+        self.parent_id = Some(id);
+    }
+
     fn as_any(&self) -> &dyn Any {
         self
     }
 
-    fn shape_eq(&self, other: &dyn Any) -> bool {
-        other.downcast_ref::<Self>().map_or(false, |a| self == a)
+    fn shape_eq(&self, other: &dyn Shape) -> bool {
+        self.id == other.id()
     }
 
     fn transform(&self) -> Matrix {
@@ -51,14 +72,14 @@ impl Shape for Plane {
     fn local_intersect(&self, ray: Ray) -> Option<Vec<Intersection>> {
         if ray.direction.y.abs() < EPSILON {
             None
-        }
-        else {
-            Some(vec![
-                Intersection::new(-ray.origin.y / ray.direction.y, self),
-            ])
+        } else {
+            Some(vec![Intersection::new(
+                -ray.origin.y / ray.direction.y,
+                self,
+            )])
         }
     }
-    
+
     fn local_normal_at(&self, _point: Point) -> Vector {
         Vector::new(0.0, 1.0, 0.0)
     }
@@ -70,11 +91,10 @@ impl PartialEq for Plane {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::{Point, Ray, Vector, shapes::Shape};
     use super::Plane;
+    use crate::{shapes::Shape, Point, Ray, Vector};
 
     #[test]
     fn normal_plane_constant_everywhere() {
@@ -99,7 +119,7 @@ mod tests {
     fn ray_intersecting_plane_from_above() {
         let p = Plane::new();
         let r = Ray::new(Point::new(0.0, 1.0, 0.0), Vector::new(0.0, -1.0, 0.0));
-        if let Some(xs) =  p.local_intersect(r) {
+        if let Some(xs) = p.local_intersect(r) {
             assert_eq!(xs.len(), 1);
             assert_eq!(xs[0].t, 1.0);
             //assert!(p.shape_eq(xs[0].object));
