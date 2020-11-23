@@ -13,3 +13,15 @@ I started to think of ownership and borrowing. The `World` owns `Shapes` in a `B
 ## performance
 
 There is a scene in `main` used to compare the cloning branch to the ownership and borrowing. I'm sure there is more to this than just cloning. I wonder the overhead on `Box`ing But what do I know I'm just starting to learn Rust. What I do know is the changes increased performance by 50%. I use the `time` function with Linux have yet to use benchmark in Rust.
+
+## Chapter 14 - Groups
+
+This was a tough chapter, circular references are frowned upon in Rust. A child shape of a group should not have a reference to the group if the group has a references to the children of the group. `<pun>` I went in circles working on this one `</pun>`. My solution is to have a container (ShapeContainer) as the root of all the shapes. The container is represented as a tree of all the shapes. Give a shape in a group a parent id of the group. When the parent shape/group is needed traverse the shape container looking for the shape with an id that matches the parent id. Instead of working up from the shape to find the parent using a borrowed reference of the parent, work from the top of the tree down using a parent shape id of the shape. Intercepting a ray worked from the group down that was easy. The Normal At uses the parent of a given shape. Therefore the ShapeContainer is passed into normal_at.
+
+```
+             SC
+            / | \
+           S  S  G
+               / | \
+              S  S  S
+```
