@@ -41,10 +41,10 @@ impl<'a> Intersection<'a> {
         hit: &'h Intersection,
         r: Ray,
         xs: &[Intersection],
-        w: Option<&ShapeContainer>,
+        sc: Option<&ShapeContainer>,
     ) -> Computations<'h> {
         let point = r.position(hit.t);
-        let mut normalv = hit.object.normal_at(point, w);
+        let mut normalv = hit.object.normal_at(point, sc);
         let mut inside = false;
         if normalv.dot(-r.direction) < 0.0 {
             inside = true;

@@ -44,12 +44,12 @@ pub trait Shape: Any + fmt::Debug {
         self.local_intersect(local_ray)
     }
 
-    fn normal_at(&self, point: Point, w: Option<&ShapeContainer>) -> Vector {
-        match w {
-            Some(w) => {
-                let local_point = self.world_to_object(point, w);
+    fn normal_at(&self, point: Point, sc: Option<&ShapeContainer>) -> Vector {
+        match sc {
+            Some(sc) => {
+                let local_point = self.world_to_object(point, sc);
                 let local_normal = self.local_normal_at(local_point);
-                self.normal_to_world(local_normal, w)
+                self.normal_to_world(local_normal, sc)
             }
             None => {
                 let local_point = self.transform().inverse() * point;
@@ -59,24 +59,16 @@ pub trait Shape: Any + fmt::Debug {
         }
     }
 
-    fn world_to_object(&self, point: Point, w: &ShapeContainer) -> Point {
+    fn world_to_object(&self, point: Point, sc: &ShapeContainer) -> Point {
         let object_point = match self.parent_id() {
             Some(id) => {
-                let parent = w.get_shape(id).expect("Shape not found!");
-                parent.world_to_object(point, w)
+                let parent = sc.get_shape(id).expect("Shape not found!");
+                parent.world_to_object(point, sc)
             }
             None => point,
         };
 
         self.transform().inverse() * object_point
-        /*
-        let object_point = match w.get_parent_shape(self.id()) {
-            Some(go) => go.world_to_object(point, w),
-            None => point
-        };
-
-        self.transform().inverse() * object_point
-        */
     }
 
     fn normal_to_world(&self, normal: Vector, w: &ShapeContainer) -> Vector {
@@ -89,13 +81,6 @@ pub trait Shape: Any + fmt::Debug {
             }
             None => world_normal,
         }
-
-        /*
-        match w.get_parent_shape(self.id()) {
-            Some(go) => go.normal_to_world(world_normal, w),
-            None => world_normal
-        }
-        */
     }
 }
 
